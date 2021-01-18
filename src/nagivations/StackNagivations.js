@@ -14,6 +14,7 @@ import SplaceScreen from '../components/SplaceScreen';
 import Logout from '../components/sidedrawe/Logout';
 import Profile from '../components/sidedrawe/Profile';
 import ChangePassword from '../components/sidedrawe/ChangePassword';
+import ListOfVehicle from '../components/ListOfVehicle';
 
 
 //for side Drawer
@@ -87,6 +88,10 @@ export default class StackNagivations extends Component {
                             headerShown: false
                         }} />
                     <Stack.Screen name="OTPScreen" component={OTPScreen}
+                        options={{
+                            headerShown: false
+                        }} />
+                    <Stack.Screen name="ListOfVehicle" component={ListOfVehicle}
                         options={{
                             headerShown: false
                         }} />

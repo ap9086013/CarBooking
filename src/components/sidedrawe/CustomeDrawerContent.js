@@ -48,7 +48,7 @@ export default class CustomDrawerContent extends Component {
     }
     render() {
         return (
-            <LinearGradient colors={['#f99050', '#f94c5d']} style={{ flex: 1, backgroundColor: '#f7f7f7' }}>
+            <LinearGradient colors={['#f99050', '#f94c5d']} style={{ flex: 1, backgroundColor: '#f7f7f7',borderWidth:0.8,borderColor:"#fff" }}>
                 <DrawerContentScrollView >
                     <View style={styles.drawerContent}>
                         <View style={styles.userInfoSection}>

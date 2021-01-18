@@ -7,11 +7,13 @@
  */
 
 import React from 'react';
-import Login from './src/components/Login';
-import SignUp from './src/components/SignUp';
-import StackNagivations from './src/nagivations/StackNagivations';
 
-const App= () => {
+import StackNagivations from './src/nagivations/StackNagivations';
+import { LogBox } from 'react-native';
+
+const App = () => {
+  LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
+  LogBox.ignoreAllLogs();//Ignore all log notifications
   return (
     <StackNagivations/>
   );
