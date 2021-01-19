@@ -4,6 +4,7 @@ import Autocomplete from 'react-native-autocomplete-input';
 import { TextInput } from 'react-native-gesture-handler';
 import LinearGradient from 'react-native-linear-gradient';
 import DatePicker from 'react-native-datepicker'
+import DateTimePicker from '@react-native-community/datetimepicker';
 const { width, height } = Dimensions.get("screen");
 const data = [{ city: "sagar" }, { city: "indore" }, { city: "bhopal" }, { city: "sagfdf" }, { city: "dgdhjghoifgr" }]
 const API = 'https://swapi.co/api';
@@ -18,11 +19,14 @@ export default class Home extends Component {
       fromDate: '',
       toData: '',
       data: data,
+      time: new Date(1598051730000)
       
     };
   }
 
   serchButton = () => {
+
+    
    this.props.navigation.navigate('ListOfVehicle')
   }
 
@@ -131,7 +135,7 @@ export default class Home extends Component {
                       date={this.state.fromDate}
                       mode="date"
                       placeholder="select date"
-                      format="DD-MM-YYYY "
+                      format="DD-MM-YYYY"
                       minDate="2021-01-17"
                       confirmBtnText="Confirm"
                       cancelBtnText="Cancel"
@@ -147,7 +151,10 @@ export default class Home extends Component {
                         }
                         // ... You can check the source to find the other keys.
                       }}
-                      onDateChange={(date) => { this.setState({ fromDate: date }) }}
+                      onDateChange={(date) => {
+                        console.log("---date-->",date)
+                        this.setState({ fromDate: date })
+                      }}
                     />
 
                   </View>
@@ -158,7 +165,7 @@ export default class Home extends Component {
                         To Date and Time :-
                   </Text>
                       <DatePicker
-                        style={{ width: 200 }}
+                        style={{ width: 200,marginLeft:"5%" }}
                         date={this.state.toData}
                         mode="date"
                         placeholder="select date"
