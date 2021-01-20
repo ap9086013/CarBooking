@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import Autocomplete from 'react-native-autocomplete-input';
 import { TextInput } from 'react-native-gesture-handler';
 import LinearGradient from 'react-native-linear-gradient';
 import DatePicker from 'react-native-datepicker'
 import DateTimePicker from '@react-native-community/datetimepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import BaseUrl from '../baseurl/BaseURL';
+import appStyles from '../styles/AppStyles';
 const { width, height } = Dimensions.get("screen");
 const data = [{ city: "sagar" }, { city: "indore" }, { city: "bhopal" }, { city: "sagfdf" }, { city: "dgdhjghoifgr" }]
 const API = 'https://swapi.co/api';
@@ -14,20 +17,85 @@ export default class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      userData:[],
       tripSelected: 'One Way Trip',
       query: '',
       fromDate: '',
       toData: '',
       data: data,
-      time: new Date(1598051730000)
+      time: new Date(1598051730000),
+      loading :false
       
     };
   }
+  componentDidMount = () => {
+    this.getData();
+    }
 
   serchButton = () => {
+    console.log("------------------")
+    this.setState({
+      loading:true
+    })
+    fetch(BaseUrl + "api/UserBooking/UserVehicleShow", {
+      method: 'POST',
+      headers: {
+        "Authorization": 'Bearer ' + this.state.userData.access_token,
+        "Accept": 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        "BookingFromDate": this.state.fromDate.toString()
+      })
+    })
+        .then((response) => response.json())
+      .then((json) => {
+        this.setState({
+          loading: false
+        })
+          if (json.successcode === 1) {
+            this.props.navigation.navigate('ListOfVehicle', {
+              data:json.data
+            })
+          //   alert(json.msg)
+          //   this.setState({
+          //     lodding: false
+          //   })
+          //   //   this.getProfileData();
+           }
+          else {
+             alert(json.msg)
+           }
+        console.log("---responce json-->", json.data)
+        })
+      .catch((error) => {
+        this.setState({
+          loading: false
+        })
+          console.log("error-->", error)
+        })
+
+
+      
+    
 
     
-   this.props.navigation.navigate('ListOfVehicle')
+  // this.props.navigation.navigate('ListOfVehicle')
+  }
+  getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('userData')
+      if (value !== null) {
+        this.setState({
+          userData: JSON.parse(value)
+        })
+        console.log("--statr--->", this.state.userData)
+        // value previously stored
+      }
+    } catch (e) {
+      // error reading value
+      console.log("-drawecontent.getData==error=>", e)
+    }
   }
 
   findFilm(query) {
@@ -135,7 +203,7 @@ export default class Home extends Component {
                       date={this.state.fromDate}
                       mode="date"
                       placeholder="select date"
-                      format="DD-MM-YYYY"
+                      format="YYYY-MM-DD"
                       minDate="2021-01-17"
                       confirmBtnText="Confirm"
                       cancelBtnText="Cancel"
@@ -200,7 +268,13 @@ export default class Home extends Component {
             }
           </ScrollView>
         </View>
+        {
+          this.state.loading ?
 
+            <View style={appStyles.lodingView}>
+              <ActivityIndicator size="large" color="#fff" />
+            </View> : null
+        }
     </LinearGradient>
     );
   }

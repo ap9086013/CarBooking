@@ -37,8 +37,7 @@ export default class CustomDrawerContent extends Component {
                 this.setState({
                     userData: JSON.parse(value)
                 })
-
-                console.log("--statr--->", this.state.userData.userName)
+                //console.log("--statr--->", this.state.userData)
                 // value previously stored
             }
         } catch (e) {

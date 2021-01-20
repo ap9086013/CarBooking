@@ -1,18 +1,26 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Dimensions, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Image, TouchableOpacity, ScrollView } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import appStyles from './styles/AppStyles';
 
 const { width, height } = Dimensions.get("screen");
 export default class ListOfVehicle extends Component {
   constructor(props) {
     super(props);
-    this.state = {
+      this.state = {
+          listAllData: this.props.route.params.data
     };
-  }
+    }
+    componentDidMount = () => {
+        console.log("-------------------------------------")
+        console.log("------userDta-->",this.state.listAllData)
+    }
 
   render() {
       return (
           <LinearGradient colors={['#f99050', '#f94c5d']} style={styles.linearMainView}>
+              <ScrollView>
+                  {this.state.listAllData.map((item)=>
               <View style={styles.vehicleListView}>
                   <View style={{ flexDirection: 'row' }}>
                       <View style={{marginLeft:'2%'}}>  
@@ -22,15 +30,25 @@ export default class ListOfVehicle extends Component {
                           />
                       </View>
                       <View style={{width:'60%',alignItems:'center',marginTop:'2%'}}>
-                      <Text style={{textAlign:'center'}}> Rate/Per KM :- 5 RS</Text>
-                      <TouchableOpacity style={styles.bookButtonStyle}>
-                          <Text>
-                              Book
+                                  <Text style={{ textAlign: 'left',fontSize:16 }}> Rate/Per KM :- {item.RoutePerKM} RS</Text>
+                                  <Text style={{ textAlign: 'left',fontSize:16  }}> Number of Seet :- {item.NoOfSeet}</Text>
+                                  <TouchableOpacity style={styles.bookButtonStyle}
+                                      onPress={() => {
+                                          console.log("--------", item)
+                                          this.props.navigation.navigate('AllDetails', {
+                                              item: item
+                                          })
+                                    
+                                  }}>
+                          <Text style={[appStyles.textColor,{fontWeight:'bold',fontSize:18}]}>
+                               All Details 
                           </Text>
                           </TouchableOpacity>
                       </View>
                   </View>
-              </View>
+                      </View>
+                  )}
+              </ScrollView>
               </LinearGradient>
     );
   }
@@ -45,7 +63,8 @@ const styles = StyleSheet.create({
         width: width / 1.1,
         height: height / 5,
         borderRadius: 30,
-        justifyContent:'center'
+        justifyContent: 'center',
+        marginTop:'2%'
      //   alignItems:'center'
     },
     imageStyles: {

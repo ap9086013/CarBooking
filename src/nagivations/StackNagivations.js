@@ -15,6 +15,7 @@ import Logout from '../components/sidedrawe/Logout';
 import Profile from '../components/sidedrawe/Profile';
 import ChangePassword from '../components/sidedrawe/ChangePassword';
 import ListOfVehicle from '../components/ListOfVehicle';
+import AllDetails from '../components/AllDetails';
 
 
 //for side Drawer
@@ -92,6 +93,10 @@ export default class StackNagivations extends Component {
                             headerShown: false
                         }} />
                     <Stack.Screen name="ListOfVehicle" component={ListOfVehicle}
+                        options={{
+                            headerShown: false
+                        }} />
+                    <Stack.Screen name="AllDetails" component={AllDetails}
                         options={{
                             headerShown: false
                         }} />
