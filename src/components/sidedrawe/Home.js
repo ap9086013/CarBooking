@@ -8,12 +8,14 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BaseUrl from '../baseurl/BaseURL';
 import appStyles from '../styles/AppStyles';
+import { connect } from "react-redux";
+
 const { width, height } = Dimensions.get("screen");
 const data = [{ city: "sagar" }, { city: "indore" }, { city: "bhopal" }, { city: "sagfdf" }, { city: "dgdhjghoifgr" }]
 const API = 'https://swapi.co/api';
 const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
 
-export default class Home extends Component {
+ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -24,7 +26,8 @@ export default class Home extends Component {
       toData: '',
       data: data,
       time: new Date(1598051730000),
-      loading :false
+      loading: false,
+      destinationCity:''
       
     };
   }
@@ -114,6 +117,7 @@ export default class Home extends Component {
     const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
     
     return (
+      
       <LinearGradient colors={['#f99050', '#f94c5d']} style={styles.linearMainView}>
         <View style={{ flexDirection: 'row',justifyContent:'space-around',width:width/1,marginTop:'2%' }}>
           <TouchableOpacity style={styles.wayTab}
@@ -144,13 +148,14 @@ export default class Home extends Component {
               </Text>
                 <View style={[styles.inputView]}>
                   <Text>
-                      From :-
+                      Source :-
                   </Text>
                     <Autocomplete
+                   //   inputContainerStyle={{ marginLeft: '19%' }}
                       autoCapitalize="none"
                       autoCorrect={false}
-                  
-                      containerStyle={styles.autocompleteContainer}
+containerStyle={styles.autocompleteContainer}
+                      listStyle={{flex:1}}
                       data={data.length === 1 && comp(query, data[0].city) ? [] : data}
                       defaultValue={query}
                       onChangeText={text => this.setState({ query: text })}
@@ -163,31 +168,20 @@ export default class Home extends Component {
                         </TouchableOpacity>
                       )}
                     />
-                    {/* <Autocomplete
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                    inputContainerStyle={{ marginLeft: '4.5%' }}
-                    //data={data}
-                    defaultValue={this.state.query}
-                    onChangeText={text => this.setState({ query: text })}
-                    renderItem={({ item, i }) => (
-                      <TouchableOpacity onPress={() => this.setState({ query: item.city })}>
-                        <Text>{item.city}</Text>
-                      </TouchableOpacity>
-                    )}
-                  /> */}
+                  
                 </View>
                 <View style={[styles.inputView]}>
                   <Text >
-                    To :-  
+                      Destination  :-  
                   </Text>
                   <Autocomplete
                     inputContainerStyle={{marginLeft:'10%'}}
                     //data={data}
-                    defaultValue={this.state.query}
-                    onChangeText={text => this.setState({ query: text })}
+                      placeholder="Enter city name whare you go"
+                      defaultValue={this.state.destinationCity}
+                      onChangeText={text => this.setState({ destinationCity: text })}
                     renderItem={({ item, i }) => (
-                      <TouchableOpacity onPress={() => this.setState({ query: item.city })}>
+                      <TouchableOpacity onPress={() => this.setState({ destinationCity: item.city })}>
                         <Text>{item.city}</Text>
                       </TouchableOpacity>
                     )}
@@ -195,11 +189,11 @@ export default class Home extends Component {
                   </View>
                   <View style={[styles.inputView]}>
                     <Text >
-                      From Date and Time :-
+                      Source Date :-
                   </Text>
                    
                     <DatePicker
-                      style={{ width: 200 }}
+                      style={{ width: 200, alignItems: 'flex-end', marginLeft: "15%", }}
                       date={this.state.fromDate}
                       mode="date"
                       placeholder="select date"
@@ -222,6 +216,7 @@ export default class Home extends Component {
                       onDateChange={(date) => {
                         console.log("---date-->",date)
                         this.setState({ fromDate: date })
+                        this.props.setFromDate(date)
                       }}
                     />
 
@@ -230,14 +225,14 @@ export default class Home extends Component {
                   {this.state.tripSelected === 'Two Way Trip' ?
                     <View style={[styles.inputView]}>
                       <Text >
-                        To Date and Time :-
+                        Destination Date  :-
                   </Text>
                       <DatePicker
-                        style={{ width: 200,marginLeft:"5%" }}
+                        style={{ width: 200,marginLeft:"5.5%",alignItems:'flex-end'}}
                         date={this.state.toData}
                         mode="date"
                         placeholder="select date"
-                        format="DD-MM-YYYY " //YYYY-MM-DD
+                        format="YYYY-MM-DD"
                         minDate="2021-01-17"
                         confirmBtnText="Confirm"
                         cancelBtnText="Cancel"
@@ -253,7 +248,11 @@ export default class Home extends Component {
                           }
                           // ... You can check the source to find the other keys.
                         }}
-                        onDateChange={(date) => { this.setState({ toData: date }) }}
+                        onDateChange={(date) => {
+                          
+                          this.setState({ toData: date })
+                          this.props.setTODate(date)
+                        }}
                       />
                     </View>
                     : null}
@@ -333,7 +332,23 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     zIndex: 1,
-    marginLeft: '17%',
+    marginLeft: '32%' 
   },
 
 })
+
+const mapStateToProps = (state) => {
+  return {
+    reducerFromDate: state.reducerFromDate,
+  //  SearchedToken: state.SearchedToken
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setFromDate: (reducerFromDate) => { dispatch({ type: 'GET_FROMEDATE', payload: reducerFromDate }) },
+    setTODate: (reducerToDate) => { dispatch({ type: 'GET_TODATE', payload: reducerToDate }) },
+    //  onEnterTokenNo: (SearchedToken) => { dispatch({ type: 'GET_SEARCHED_TOKEN', payload: SearchedToken }) }
+  }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(Home)
