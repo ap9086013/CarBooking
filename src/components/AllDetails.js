@@ -36,6 +36,8 @@ const { width, height } = Dimensions.get("screen");
      }
      componentDidMount = () => {
          console.log("---data-->", this.state.data)
+         console.log("--array-->", this.props.reduceSourceCityArray)
+         console.log("--Destinationarray-->", this.props.reduceDestinationCityArray)
          console.log("--reducer--", this.props.reducerTripSelectedID, "-----name", this.props.reducerTripSelected)
          console.log()
          this.getData();
@@ -71,11 +73,11 @@ const { width, height } = Dimensions.get("screen");
              "BookingFromTime": "2021-01-22",
              "BookingToDate": this.props.reducerToDate,
              "BookingToTime": "15:59",
-             "SourceCityCode": 17,
-             "SourceCityName": "Sagar",
-             "SourceStateCode": 14,
+             "SourceCityCode": this.props.reduceSourceCityArray.CityCode,
+             "SourceCityName": this.props.reduceSourceCityArray.CityDesc,
+             "SourceStateCode": this.props.reduceSourceCityArray.StateCode,
              "SourceStateDesc": "M.p",
-             "DestinStateCode": 12,
+             "DestinStateCode": this.props.reduceDestinationCityArray.StateCode,
              "DestinStateDesc": "ddb"
          }))
          
@@ -86,24 +88,24 @@ const { width, height } = Dimensions.get("screen");
         //         "Accept": 'application/json',
         //         'Content-Type': 'application/json'
         //     },
-        //     body: JSON.stringify({
-        //         "VichalCode": this.state.data.VehicleCode,
-        //         "VichalRegCode": "MP15 MM 4323",
-        //         "OneorTwoWayCode": 1,
-        //         "OneorTwoWayDesc": "One Way Trip",//this.state.data,
-        //         "BookingDate":"2021-01-22",
-        //         "BookingTime": "15:19",
-        //         "BookingFromDate":"2021-01-22",
-        //         "BookingFromTime": "2021-01-22",
-        //         "BookingToDate": "2021-01-22",
-        //         "BookingToTime": "15:59",
-        //         "SourceCityCode": 17,
-        //         "SourceCityName": "Sagar",
-        //         "SourceStateCode":14,
-        //         "SourceStateDesc": "M.p",
-        //         "DestinStateCode": 12,
-        //         "DestinStateDesc":"ddb"
-        //     })
+        //  JSON.stringify({
+        //      "VichalCode": this.state.data.VehicleCode,
+        //      "VichalRegCode": this.state.data.RegistrationNo,
+        //      "OneorTwoWayCode": this.props.reducerTripSelectedID,
+        //      "OneorTwoWayDesc": this.props.reducerTripSelected,//this.state.data,
+        //      "BookingDate": this.state.currentDate,
+        //      "BookingTime": this.state.currentTime,
+        //      "BookingFromDate": this.props.reducerFromDate,
+        //      "BookingFromTime": "2021-01-22",
+        //      "BookingToDate": this.props.reducerToDate,
+        //      "BookingToTime": "15:59",
+        //      "SourceCityCode": this.props.reduceSourceCityArray.CityCode,
+        //      "SourceCityName": this.props.reduceSourceCityArray.CityDesc,
+        //      "SourceStateCode": this.props.reduceSourceCityArray.StateCode,
+        //      "SourceStateDesc": "M.p",
+        //      "DestinStateCode": this.props.reduceDestinationCityArray.StateCode,
+        //      "DestinStateDesc": "ddb"
+        //  })
         // })
         //     .then((response) => response.json())
         //     .then((json) => {
@@ -195,7 +197,9 @@ const mapStateToProps = (state) => {
         reducerToDate:state.reducerToDate,
         reducerToTime: state.reducerToTime,
         reducerTripSelectedID: state.reducerTripSelectedID,
-        reducerTripSelected: state.reducerTripSelected
+        reducerTripSelected: state.reducerTripSelected,
+        reduceSourceCityArray: state.reduceSourceCityArray,
+        reduceDestinationCityArray: state.reduceDestinationCityArray,
         
 
         //  SearchedToken: state.SearchedToken

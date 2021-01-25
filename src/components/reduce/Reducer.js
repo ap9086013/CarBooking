@@ -4,7 +4,9 @@ const iState= {
     reducerToDate: "0",
     reducerToTime: "0",
     reducerTripSelected: "One Way Trip",
-    reducerTripSelectedID:1
+    reducerTripSelectedID: 1,
+    reduceSourceCityArray: [],
+    reduceDestinationCityArray:[]
     
 }
 
@@ -40,10 +42,22 @@ const reducer =(state=iState,action)=>{
                 reducerTripSelected: action.payload
         }
     }
+    if (action.type == 'reduceSourceCityArray') {
+        return {
+            ...state,
+            reduceSourceCityArray: action.payload
+        }
+    }
     if (action.type == 'Trip_SelectedID') {
         return {
             ...state,
             reducerTripSelectedID: action.payload
+        }
+    }
+    if (action.type == 'reduceDestinationCityArray') {
+        return {
+            ...state,
+            reduceDestinationCityArray: action.payload
         }
     }
     return state;
