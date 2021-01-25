@@ -1,22 +1,18 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, ScrollView, ActivityIndicator } from 'react-native';
 import Autocomplete from 'react-native-autocomplete-input';
-import { TextInput } from 'react-native-gesture-handler';
 import LinearGradient from 'react-native-linear-gradient';
 import DatePicker from 'react-native-datepicker'
-import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BaseUrl from '../baseurl/BaseURL';
 import appStyles from '../styles/AppStyles';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons"
 import { connect } from "react-redux";
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const { width, height } = Dimensions.get("screen");
-//const data = [{ city: "sagar" }, { city: "indore" }, { city: "bhopal" }, { city: "sagfdf" }, { city: "dgdhjghoifgr" }]
-const data = []
-const API = 'https://swapi.co/api';
-const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
-
+const data = [];
 class Home extends Component {
   constructor(props) {
     super(props);
@@ -28,16 +24,17 @@ class Home extends Component {
       fromDate: '',
       toData: '',
       data: data,
-      time: new Date(1598051730000),
       loading: false,
       destinationCity: '',
       cityArray: [],
-      sourceTime: new Date(1598051740000),
+      sourceTime:" __ / __",
       sourceTimeFlag: false,
+      zIndexFlag: 0,
 
     };
   }
   componentDidMount = () => {
+
     this.getCity();
     this.getData();
   }
@@ -153,32 +150,41 @@ class Home extends Component {
   }
 
   sourceCitySearch(sourceCityName) {
-    console.log("-sourceCityName-->", sourceCityName)
+    // console.log("-sourceCityName-->", sourceCityName)
     if (sourceCityName === '') {
       return [];
     }
 
 
-
     const { data } = this.state;
-    const regex = new RegExp(sourceCityName.trim().toUpperCase(), 'i');
-    // const regex = new RegExp(`${sourceCityName.trim()}`, 'i');
-    console.log("regex ==> ", regex);
-    return data.filter(film => film.CityDesc.search(regex) >= 0);
+    return data.filter(film => film.CityDesc.toLowerCase().startsWith(sourceCityName.toLowerCase())
+    ).map(citysData => citysData);
+
+    // return data.filter(film => film.CityDesc.search(regex) >= 0);
   }
   sourceTimeGet = (event, selectedDate) => {
     const currentDate = selectedDate || this.state.sourceTime;
-    //  setShow(Platform.OS === 'ios');
-    //  setDate(currentDate);
     console.log("----ev-->", event)
   };
+
+  hideDatePicker = () => {
+    this.setState({ sourceTimeFlag: false })
+  };
+
+  handleConfirm = (date) => {
+    console.warn("A date has been picked: ", date);
+    this.hideDatePicker();
+  };
+
+
+
   render() {
     const { sourceCityName } = this.state;
     var sourceCityData = this.sourceCitySearch(sourceCityName);
+    var destinationCirtData = this.sourceCitySearch(this.state.destinationCity);
     const sourceCityComp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
 
     return (
-
       <LinearGradient colors={['#f99050', '#f94c5d']} style={styles.linearMainView}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: width / 1, marginTop: '2%' }}>
           <TouchableOpacity style={styles.wayTab}
@@ -229,6 +235,7 @@ class Home extends Component {
                       renderItem={({ item }) => (
                         <TouchableOpacity onPress={() => {
                           sourceCityData = null
+                          this.props.setSourceCity(item)
                           this.setState({ sourceCityName: item.CityDesc })
                         }}>
                           <Text style={styles.itemText}>
@@ -244,20 +251,31 @@ class Home extends Component {
                       Destination  :-
                   </Text>
                     <Autocomplete
-                      inputContainerStyle={{ marginLeft: '10%' }}
-                      //sourceCityData={data}
+                      // inputContainerStyle={{ marginLeft: '10%' }}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      containerStyle={{
+                        flex: 1,
+                        left: 0,
+                        position: 'absolute',
+                        right: 0,
+                        top: 0,
+                        zIndex: this.state.zIndexFlag,
+                        marginLeft: '32%'
+                      }}
                       listStyle={{ flex: 1 }}
-                      data={sourceCityData.length === 1 && sourceCityComp(this.state.destinationCity, sourceCityData[0].CityDesc) ? [] : sourceCityData}
+                      data={destinationCirtData.length === 1 && sourceCityComp(this.state.destinationCity, destinationCirtData[0].CityDesc) ? [] : destinationCirtData}
                       placeholder="Enter city name whare you go"
                       defaultValue={this.state.destinationCity}
-                      defaultValue={this.state.destinationCity}
-                      onChangeText={text => this.setState({ destinationCity: text })}
+                      onChangeText={text => { this.setState({ destinationCity: text, zIndexFlag: 1 }) }}
                       renderItem={({ item, i }) => (
                         <TouchableOpacity onPress={() => {
                           sourceCityData = null
-                          this.setState({ destinationCity: item.city })
+                          this.props.setDestinationCity(item)
+
+                          this.setState({ destinationCity: item.CityDesc })
                         }}>
-                          <Text>{item.city}</Text>
+                          <Text style={styles.itemText}>{item.CityDesc}</Text>
                         </TouchableOpacity>
                       )}
                     />
@@ -308,16 +326,31 @@ class Home extends Component {
                         name="access-time"
                         size={height / 25} />
                     </TouchableOpacity>
-                    <Text>Time</Text>
+                    <Text style={{}}>{this.state.sourceTime }</Text>
                     {this.state.sourceTimeFlag && (
                       <DateTimePicker
-                        testID="dateTimePicker"
-                        value={this.state.sourceTime}
-                        mode={"time"}
-                        is24Hour={true}
+                      //  testID="dateTimePicker"
+                        firstDayOfWeek={true}
+                        value={new Date()}
+                        mode="time"
+                        is24Hour={false}
+                        showIcon={true}
                         display="default"
-                        onChange={(time, e) => { console.log("--time-->", time, "----", e) }}
-                      />)}
+                        onChange={(time, e) => {
+
+                          console.log("--time-->", time, "---=time-->", e, "----", e.toLocaleTimeString())
+                          this.setState({
+                            sourceTime: e.toLocaleTimeString(),
+                            sourceTimeFlag:false})
+                           
+                          }}
+                          />
+                      // <RNDateTimePicker
+                      //   value={this.state.sourceTime}
+                      //   mode="time"
+                      //   onChange={(time, e) => { console.log("--time-->", time, "----", e) }}/>
+
+                    )}
 
 
                   </View>
@@ -417,12 +450,13 @@ const styles = StyleSheet.create({
   },
   searchButton: {
     backgroundColor: "#ff6e59",
-    width: '60%',
-    height: '8%',
+    width: width / 2,
+    height: height / 20,
     borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: '5%'
+    marginTop: '5%',
+    alignSelf: 'center'
 
   },
   autocompleteContainer: {
@@ -437,6 +471,19 @@ const styles = StyleSheet.create({
   itemText: {
     margin: '2%',
     fontSize: 16
+  },
+  autocomplete: {
+    alignSelf: "stretch",
+    height: 50,
+    margin: 10,
+    marginTop: 50,
+    backgroundColor: "#FFF",
+    borderColor: "lightblue",
+    borderWidth: 1
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#F5FCFF"
   }
 
 })
@@ -454,6 +501,8 @@ const mapDispatchToProps = (dispatch) => {
     setTODate: (reducerToDate) => { dispatch({ type: 'GET_TODATE', payload: reducerToDate }) },
     setTripSelectedID: (reducerTripSelectedID) => { dispatch({ type: 'Trip_SelectedID', payload: reducerTripSelectedID }) },
     setTripSelected: (reducerTripSelected) => { dispatch({ type: 'Trip_Selected', payload: reducerTripSelected }) },
+    setSourceCity: (reduceSourceCityArray) => { dispatch({ type: 'reduceSourceCityArray', payload: reduceSourceCityArray }) },
+    setDestinationCity: (reduceDestinationCityArray) => { dispatch({ type: 'reduceDestinationCityArray', payload: reduceDestinationCityArray }) },
 
     //  onEnterTokenNo: (SearchedToken) => { dispatch({ type: 'GET_SEARCHED_TOKEN', payload: SearchedToken }) }
   }
