@@ -3,23 +3,115 @@ import { View, Text, StyleSheet, Dimensions, Image, TouchableOpacity, ScrollView
 import LinearGradient from 'react-native-linear-gradient';
 import appStyles from './styles/AppStyles';
 import { connect } from "react-redux";
+import BaseUrl from './baseurl/BaseURL';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get("screen");
  class AllDetails extends Component {
   constructor(props) {
     super(props);
       this.state = {
-          data: this.props.route.params.item
+          data: this.props.route.params.item,
+          userData: [],
+          currentDate: '',
+          currentTime:'',
     };
-    }
-    componentDidMount = () => {
-        console.log("---------------props----------------------", this.props.reducerFromDate)
-        console.log("------userDta-->", this.props.reducerFromTime)
-        console.log("===todate==>", this.props.reducerToDate)
- console.log("-----------gggjj-->",this.props.reducerToTime)
-    }
-    bookSubmit = () => {
-        
+
+      
+     }
+     getData = async () => {
+         try {
+             const value = await AsyncStorage.getItem('userData')
+             if (value !== null) {
+                 this.setState({
+                     userData: JSON.parse(value)
+                 })
+                 console.log("--statr--->", this.state.userData)
+                 // value previously stored
+             }
+         } catch (e) {
+             // error reading value
+             console.log("-drawecontent.getData==error=>", e)
+         }
+     }
+     componentDidMount = () => {
+         console.log("---data-->", this.state.data)
+         console.log("--reducer--", this.props.reducerTripSelectedID, "-----name", this.props.reducerTripSelected)
+         console.log()
+         this.getData();
+         this.getCureentDate_Time();
+     
+     }
+     
+
+     getCureentDate_Time = async () => {
+         var date = new Date().getDate();
+         var month = new Date().getMonth() + 1;
+         var year = new Date().getFullYear();
+         var hours = new Date().getHours(); //Current Hours
+         var min = new Date().getMinutes(); //Current Minutes
+         var sec = new Date().getSeconds(); //Current Seconds
+
+        await  this.setState({
+             currentDate: year + '-' + month + '-' + date,
+             currentTime: hours + ":" + min + ":" + sec
+         })
+         console.log("---time-----",this.state.currentDate,"-----",this.state.currentTime)
+     }
+
+     bookSubmit = () => {
+         console.log("URL---->", JSON.stringify({
+             "VichalCode": this.state.data.VehicleCode,
+             "VichalRegCode": this.state.data.RegistrationNo,
+             "OneorTwoWayCode": this.props.reducerTripSelectedID,
+             "OneorTwoWayDesc": this.props.reducerTripSelected,//this.state.data,
+             "BookingDate": this.state.currentDate,
+             "BookingTime": this.state.currentTime,
+             "BookingFromDate": this.props.reducerFromDate,
+             "BookingFromTime": "2021-01-22",
+             "BookingToDate": this.props.reducerToDate,
+             "BookingToTime": "15:59",
+             "SourceCityCode": 17,
+             "SourceCityName": "Sagar",
+             "SourceStateCode": 14,
+             "SourceStateDesc": "M.p",
+             "DestinStateCode": 12,
+             "DestinStateDesc": "ddb"
+         }))
+         
+        // fetch(BaseUrl +'api/UserBooking/UserBooking',{
+        //     method: 'POST',
+        //     headers: {
+        //         "Authorization": 'Bearer ' + this.state.userData.access_token,
+        //         "Accept": 'application/json',
+        //         'Content-Type': 'application/json'
+        //     },
+        //     body: JSON.stringify({
+        //         "VichalCode": this.state.data.VehicleCode,
+        //         "VichalRegCode": "MP15 MM 4323",
+        //         "OneorTwoWayCode": 1,
+        //         "OneorTwoWayDesc": "One Way Trip",//this.state.data,
+        //         "BookingDate":"2021-01-22",
+        //         "BookingTime": "15:19",
+        //         "BookingFromDate":"2021-01-22",
+        //         "BookingFromTime": "2021-01-22",
+        //         "BookingToDate": "2021-01-22",
+        //         "BookingToTime": "15:59",
+        //         "SourceCityCode": 17,
+        //         "SourceCityName": "Sagar",
+        //         "SourceStateCode":14,
+        //         "SourceStateDesc": "M.p",
+        //         "DestinStateCode": 12,
+        //         "DestinStateDesc":"ddb"
+        //     })
+        // })
+        //     .then((response) => response.json())
+        //     .then((json) => {
+             
+        //         console.log("profile-->", json)
+        //     }).catch((error) => {
+        //         console.log("--error==>", error)
+        //     })
     }
 
   render() {
@@ -42,6 +134,7 @@ const { width, height } = Dimensions.get("screen");
                         <Text style={styles.textStyle}> Number of Seet :-  {this.state.data.NoOfSeet}</Text>
                         <TouchableOpacity style={styles.bookButtonStyle}
                             onPress={() => {
+                                this.bookSubmit();
                                 console.log("--------")
                                 
                             }}>
@@ -100,7 +193,10 @@ const mapStateToProps = (state) => {
         reducerFromDate: state.reducerFromDate,
         reducerFromTime: state.reducerFromTime,
         reducerToDate:state.reducerToDate,
-        reducerToTime: state.reducerToTime
+        reducerToTime: state.reducerToTime,
+        reducerTripSelectedID: state.reducerTripSelectedID,
+        reducerTripSelected: state.reducerTripSelected
+        
 
         //  SearchedToken: state.SearchedToken
     }
